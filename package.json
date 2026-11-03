@@ -1,0 +1,23 @@
+{
+  "name": "nutritrack",
+  "version": "1.0.0",
+  "description": "trabalho faculdade ",
+  "main": "Index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GabrielcDevv/Nutritrack.git"
+  },
+  "keywords": [
+    "faculdade",
+    "extensao"
+  ],
+  "author": "Gabriel Campos, Erick Kran, Pedro Henrique, Ivy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GabrielcDevv/Nutritrack/issues"
+  },
+  "homepage": "https://github.com/GabrielcDevv/Nutritrack#readme"
+}
