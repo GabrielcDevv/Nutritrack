@@ -33,7 +33,7 @@ app.get("/", (req,res)=>{
 })
 
 app.get("/cadastro", (req, res)=>{
-    res.render("cadastro.html");
+    res.render("cadastro.ejs");
 });
 
 app.get("/cronograma:id", async (req,res)=>{
@@ -42,7 +42,7 @@ app.get("/cronograma:id", async (req,res)=>{
         const horario = req.body.id_horario;
     try{
         await db.query("SELECT * FROM usuario_alimento_dia_horario WHERE id_usuario = $1, id_dia = $2, id_horario =  $3"[id_usuario,diaSemana,horario]);
-        res.render("cronograma.html");
+        res.render("cronograma.ejs");
     } catch{
         console.log(err);
     }
