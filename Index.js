@@ -6,19 +6,19 @@ const db = new pg.Client ({
     user: "postgres",
     host: "localhost",
     database: "NutriTrack",
-    password: "patoduro",
+    password: "Patoduro1!",
     port: 5432,
 });
 
 const app = express();
 const port = 3000;
 
-db.conect();
+db.connect();
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("Public"));
 
-app.post("/Cadastro", async (req, res)=>{
+app.post("/cadastro", async (req, res)=>{
     const nomeUsuario = req.body.nome_usuario;
     const email = req.body.email;
     const senha = req.body.senha;
@@ -28,9 +28,24 @@ app.post("/Cadastro", async (req, res)=>{
         console.log(err);
     }
 } );
+app.get("/", (req,res)=>{
+    res.render("home.ejs");
+})
 
-app.get("/Cadastro", (req, res)=>{
-    res.render("cadastro.html")
+app.get("/cadastro", (req, res)=>{
+    res.render("cadastro.html");
+});
+
+app.get("/cronograma:id", async (req,res)=>{
+        const id_usuario = req.params.id_usuario;
+        const diaSemana = req.body.id_dia;
+        const horario = req.body.id_horario;
+    try{
+        await db.query("SELECT * FROM usuario_alimento_dia_horario WHERE id_usuario = $1, id_dia = $2, id_horario =  $3"[id_usuario,diaSemana,horario]);
+        res.render("cronograma.html");
+    } catch{
+        console.log(err);
+    }
 });
 
 app.listen(port, ()=>{
