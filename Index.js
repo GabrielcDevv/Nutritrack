@@ -19,17 +19,21 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("Public"));
 
 app.post("/cadastro", async (req, res)=>{
-    const nomeUsuario = req.body.nome_usuario;
+    const nome_usuario = req.body.nome_usuario;
     const email = req.body.email;
     const senha = req.body.senha;
     try{
-        await db.query("INSERT INTO usuario nome_usuario, email, senha VALUES ($1, $2, $3)"[nomeUsuario, email, senha]);
+        await db.query("INSERT INTO usuario (nome_usuario, email, senha) VALUES ($1, $2, $3)",[nome_usuario, email, senha]);
+        res.render("index.ejs");
     } catch {
-        console.log(err);
+        console.log("Dados nao enviados");
+        console.log(nome_usuario);
+        console.log(email);
+        console.log(senha);
     }
 } );
 app.get("/", (req,res)=>{
-    res.render("home.ejs");
+    res.render("index.ejs");
 })
 
 app.get("/cadastro", (req, res)=>{
