@@ -1,6 +1,8 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
+import { error } from "node:console";
+
 
 const db = new pg.Client ({
     user: "postgres",
@@ -22,15 +24,21 @@ app.post("/cadastro", async (req, res)=>{
     const nome_usuario = req.body.nome_usuario;
     const email = req.body.email;
     const senha = req.body.senha;
+
+    const checarEmail = await db.query("SELECT id_usuario FROM usuario WHERE LOWER(email) = $1", [email]);
+    
     try{
-        await db.query("INSERT INTO usuario (nome_usuario, email, senha) VALUES ($1, $2, $3)",[nome_usuario, email, senha]);
-        res.render("index.ejs");
-    } catch {
-        console.log("Dados nao enviados");
-        console.log(nome_usuario);
-        console.log(email);
-        console.log(senha);
-    }
+        if(checarEmail.rowCount > 0)
+        {
+           return res.send("<script>alert('Email já cadastrado'); window.location.href='/cadastro';</script>");
+        } else{
+            await db.query("INSERT INTO usuario (nome_usuario, email, senha) VALUES ($1, $2, $3)",[nome_usuario, email, senha]);
+            res.render("index.ejs");
+        }
+            } catch {
+            console.log("Dados nao enviados");
+            return res.send("<script>alert('Cadastro deu errado'); window.location.href='/cadastro';</script>");
+                    }
 } );
 app.get("/", (req,res)=>{
     res.render("index.ejs");
