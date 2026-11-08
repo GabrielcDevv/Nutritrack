@@ -20,6 +20,30 @@ db.connect();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("Public"));
 
+app.get("/", (req,res)=>{
+    res.render("index.ejs");
+})
+
+app.get("/cadastro", (req, res)=>{
+    res.render("cadastro.ejs");
+});
+
+app.get("/login", (req, res)=>{
+    res.render("login.ejs");
+})
+
+app.get("/cronograma:id", async (req,res)=>{
+        const id_usuario = req.params.id_usuario;
+        const diaSemana = req.body.id_dia;
+        const horario = req.body.id_horario;
+    try{
+        await db.query("SELECT * FROM usuario_alimento_dia_horario WHERE id_usuario = $1, id_dia = $2, id_horario =  $3"[id_usuario,diaSemana,horario]);
+        res.render("cronograma.ejs");
+    } catch{
+        console.log(err);
+    }
+});
+
 app.post("/cadastro", async (req, res)=>{
     const nome_usuario = req.body.nome_usuario;
     const email = req.body.email;
@@ -40,21 +64,26 @@ app.post("/cadastro", async (req, res)=>{
             return res.send("<script>alert('Cadastro deu errado'); window.location.href='/cadastro';</script>");
                     }
 } );
-app.get("/", (req,res)=>{
-    res.render("index.ejs");
-})
 
-app.get("/cadastro", (req, res)=>{
-    res.render("cadastro.ejs");
-});
+app.post("/login", async (req, res)=>{
+    const email = req.body.email;
+    const senha = req.body.senha;
 
-app.get("/cronograma:id", async (req,res)=>{
-        const id_usuario = req.params.id_usuario;
-        const diaSemana = req.body.id_dia;
-        const horario = req.body.id_horario;
     try{
-        await db.query("SELECT * FROM usuario_alimento_dia_horario WHERE id_usuario = $1, id_dia = $2, id_horario =  $3"[id_usuario,diaSemana,horario]);
-        res.render("cronograma.ejs");
+    const resultado = await db.query("SELECT * FROM usuario WHERE LOWER(email) = $1", [email]);
+        if(usuario.rows.length > 0){
+            const user = resultado.rows[0];
+            const senhaChecar = user.senha;
+            const idUsuario = user.id_usuario;
+
+                if(senhaChecar == senha){
+                    res.redirect(`/${idUsuario}`);
+                } else {
+                    res.send("Senha incorreta");
+                }
+        } else {
+            res.send("Usuario não cadastrado");
+        }
     } catch{
         console.log(err);
     }
