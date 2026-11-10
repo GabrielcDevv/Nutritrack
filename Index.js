@@ -1,7 +1,8 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
-import { error } from "node:console";
+import bcrypt from "bcrypt";
+import { sensitiveHeaders } from "node:http2";
 
 
 const db = new pg.Client ({
@@ -14,6 +15,7 @@ const db = new pg.Client ({
 
 const app = express();
 const port = 3000;
+const saltRound = 10;
 
 db.connect();
 
@@ -56,8 +58,15 @@ app.post("/cadastro", async (req, res)=>{
         {
            return res.send("<script>alert('Email já cadastrado'); window.location.href='/cadastro';</script>");
         } else{
-            await db.query("INSERT INTO usuario (nome_usuario, email, senha) VALUES ($1, $2, $3)",[nome_usuario, email, senha]);
+            bcrypt.hash(senha, saltRound, async (err, hash)=>{
+                if(err){
+                    console.log("Erro durante o hash", err);
+                } else {
+            await db.query("INSERT INTO usuario (nome_usuario, email, senha) VALUES ($1, $2, $3)",[nome_usuario, email, hash]);
             res.render("index.ejs");
+        }
+        });
+                
         }
             } catch {
             console.log("Dados nao enviados");
@@ -76,11 +85,18 @@ app.post("/login", async (req, res)=>{
             const senhaChecar = user.senha;
             const idUsuario = user.id_usuario;
 
-                if(senhaChecar == senha){
-                    res.redirect(`/${idUsuario}`);
+
+            bcrypt.compare(senha, senhaChecar, (err, result)=>{
+                if(err){
+                    console.log("erro comparando as senhas", err);
                 } else {
-                    res.send("Senha incorreta");
+                    if(result){
+                    res.redirect(`/${idUsuario}`);
+                    } else {
+                        res.send("Senha incorreta");
+                    }
                 }
+            });
         } else {
             res.send("Usuario não cadastrado");
         }
