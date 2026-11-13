@@ -2,7 +2,10 @@ import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
 import bcrypt from "bcrypt";
-import { sensitiveHeaders } from "node:http2";
+import session from "express-session";
+import passport from "passport";
+import { Strategy } from "passport-local";
+import { render } from "ejs";
 
 
 const db = new pg.Client ({
@@ -22,6 +25,15 @@ db.connect();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("Public"));
 
+app.use(session({
+    secret: "Tantofazisso",
+    resave: false,
+    saveUninitialized: true
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.get("/", (req,res)=>{
     res.render("index.ejs");
 })
@@ -34,16 +46,20 @@ app.get("/login", (req, res)=>{
     res.render("login.ejs");
 })
 
-app.get("/cronograma:id", async (req,res)=>{
-        const id_usuario = req.params.id_usuario;
-        const diaSemana = req.body.id_dia;
-        const horario = req.body.id_horario;
-    try{
-        await db.query("SELECT * FROM usuario_alimento_dia_horario WHERE id_usuario = $1, id_dia = $2, id_horario =  $3"[id_usuario,diaSemana,horario]);
-        res.render("cronograma.ejs");
-    } catch{
-        console.log(err);
-    }
+app.get("/cronograma", async (req,res)=>{
+        if(req.isAuthenticated()){
+                const id_usuario = req.user.id_usuario;
+                const diaSemana = req.body.id_dia;
+                const horario = req.body.id_horario;
+            try{
+                await db.query("SELECT * FROM usuario_alimento_dia_horario WHERE id_usuario = $1, id_dia = $2, id_horario =  $3"[id_usuario,diaSemana,horario]);
+                res.render("cronograma.ejs");
+            } catch{
+                console.log(err);
+            }
+        } else{
+            res.redirect("/login");
+        }
 });
 
 app.post("/cadastro", async (req, res)=>{
@@ -74,35 +90,41 @@ app.post("/cadastro", async (req, res)=>{
                     }
 } );
 
-app.post("/login", async (req, res)=>{
-    const email = req.body.email;
-    const senha = req.body.senha;
+app.post("/login", async (req, res)=>{});
 
-    try{
-    const resultado = await db.query("SELECT * FROM usuario WHERE LOWER(email) = $1", [email]);
+passport.use(new Strategy(async function verify(email, senha, cb){
+     try{
+    const resultado = await db.query("SELECT * FROM usuario WHERE (email) = $1, $2", [email]);
+
         if(usuario.rows.length > 0){
             const user = resultado.rows[0];
             const senhaChecar = user.senha;
-            const idUsuario = user.id_usuario;
-
 
             bcrypt.compare(senha, senhaChecar, (err, result)=>{
                 if(err){
-                    console.log("erro comparando as senhas", err);
+                   return cb(err);
                 } else {
                     if(result){
-                    res.redirect(`/${idUsuario}`);
+                    return cb(null, user);
                     } else {
-                        res.send("Senha incorreta");
+                        return cb(null, false);
                     }
                 }
             });
         } else {
-            res.send("Usuario não cadastrado");
+            return cb("Usuario não cadastrado");
         }
     } catch{
-        console.log(err);
+        return cb(err);
     }
+}));
+
+passport.serializeUser((user, cb)=>{
+    cb(null, user);
+});
+
+passport.deserializeUser((user, cb)=>{
+    cb(null, user);
 });
 
 app.listen(port, ()=>{
