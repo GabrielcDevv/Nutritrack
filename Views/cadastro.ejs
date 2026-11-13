@@ -10,13 +10,25 @@
         <h1>Página de Cadastro</h1>
     </div>
 
-    <form action="/cadastro" method="POST">
+    <form action="/cadastrar_usuario.js" method="POST">
         <label for="nome_usuario">Primeiro nome</label> <br>
-        <input type="text" id="nome_usuario" name="nome_usuario"> <br>
+        <input type="text" id="nome_usuario" name="nome" required> <br>
         <label for="email">Email</label> <br>
-        <input type="email" id="email" name="email"> <br>
+        <input type="email" id="email" name="email" required> <br>
         <label for="senha">Senha</label> <br>
-        <input type="password" id="senha" name="senha"><br>
+        <input type="password" id="senha" name="senha" required><br>
+        <label for="idade">Sua idade</label><br>
+        <input type="number" id="idade" name="idade" min="0" max="120" step="1" required><br>
+        <label for="genero">Seu Gênero</label><br>
+        <small style="display: block; color: #666; margin-bottom: 8px;">
+            Selecione o gênero de nascença para um cálculo de gasto calórico mais preciso
+        </small>
+        <input type="radio" id="feminino" name="genero" value="feminino">
+        <label for="feminino">Feminino</label><br>
+
+        <input type="radio" id="masculino" name="genero" value="masculino">
+        <label for="masculino">Masculino</label><br>
+
         <input type="submit" value="Enviar">
     </form>
 </body>
