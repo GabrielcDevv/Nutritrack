@@ -37,16 +37,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.get("/", (req,res)=>{
-    res.render("index.ejs");
+    res.render("login.ejs");
 })
 
 app.get("/cadastro", (req, res)=>{
     res.render("cadastro.ejs");
 });
 
-app.get("/login", (req, res)=>{
-    res.render("login.ejs");
-})
 
 app.get("/cronograma", async (req,res)=>{
         if(req.isAuthenticated()){
@@ -60,7 +57,7 @@ app.get("/cronograma", async (req,res)=>{
                 console.log(err);
             }
         } else{
-            res.redirect("/login");
+            res.redirect("/");
         }
 });
 
@@ -98,9 +95,9 @@ app.post("/cadastro", async (req, res)=>{
                     }
 } );
 
-app.post("/login", passport.authenticate("local", {
+app.post("/", passport.authenticate("local", {
     successRedirect: "/cronograma",
-    failureRedirect: "/login",
+    failureRedirect: "/",
 }));
 
 passport.use(new Strategy({
