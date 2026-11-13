@@ -55,7 +55,7 @@ app.get("/cronograma", async (req,res)=>{
                 const horario = req.body.id_horario;
             try{
                 await db.query("SELECT * FROM usuario_alimento_dia_horario WHERE id_usuario = $1, id_dia = $2, id_horario =  $3"[id_usuario,diaSemana,horario]);
-                res.render("cronograma.ejs");
+                res.redirect("/");
             } catch{
                 console.log(err);
             }
@@ -68,6 +68,8 @@ app.post("/cadastro", async (req, res)=>{
     const nome_usuario = req.body.nome_usuario;
     const email = req.body.email;
     const senha = req.body.senha;
+    const genero = req.body.genero;
+    const idade = req.body.idade;
 
     const checarEmail = await db.query("SELECT id_usuario FROM usuario WHERE LOWER(email) = $1", [email]);
     
@@ -80,7 +82,7 @@ app.post("/cadastro", async (req, res)=>{
                 if(err){
                     console.log("Erro durante o hash", err);
                 } else {
-            const result = await db.query("INSERT INTO usuario (nome_usuario, email, senha) VALUES ($1, $2, $3) RETURNING *",[nome_usuario, email, hash]);
+            const result = await db.query("INSERT INTO usuario (nome_usuario, email, senha, idade, genero) VALUES ($1, $2, $3, $4, $5) RETURNING *",[nome_usuario, email, hash, idade, genero]);
            const user = result.rows[0];
            req.login(user, (err)=>{
             console.log(err);
@@ -101,11 +103,14 @@ app.post("/login", passport.authenticate("local", {
     failureRedirect: "/login",
 }));
 
-passport.use(new Strategy(async function verify(email, senha, cb){
+passport.use(new Strategy({
+    usernameField: 'email',
+    passwordField:'senha'
+}, async function verify(email, senha, cb){
      try{
-    const resultado = await db.query("SELECT * FROM usuario WHERE (email) = $1, $2", [email]);
+        const resultado = await db.query("SELECT * FROM usuario WHERE (email) = $1", [email]);
 
-        if(usuario.rows.length > 0){
+        if(resultado.rows.length > 0){
             const user = resultado.rows[0];
             const senhaChecar = user.senha;
 
@@ -123,7 +128,7 @@ passport.use(new Strategy(async function verify(email, senha, cb){
         } else {
             return cb("Usuario não cadastrado");
         }
-    } catch{
+    } catch(err){
         return cb(err);
     }
 }));
