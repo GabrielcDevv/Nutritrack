@@ -5,7 +5,6 @@ import bcrypt from "bcrypt";
 import session from "express-session";
 import passport from "passport";
 import { Strategy } from "passport-local";
-import { render } from "ejs";
 
 
 const db = new pg.Client ({
@@ -28,7 +27,10 @@ app.use(express.static("Public"));
 app.use(session({
     secret: "Tantofazisso",
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24,
+        },
 }));
 
 app.use(passport.initialize());
@@ -78,8 +80,12 @@ app.post("/cadastro", async (req, res)=>{
                 if(err){
                     console.log("Erro durante o hash", err);
                 } else {
-            await db.query("INSERT INTO usuario (nome_usuario, email, senha) VALUES ($1, $2, $3)",[nome_usuario, email, hash]);
-            res.render("index.ejs");
+            const result = await db.query("INSERT INTO usuario (nome_usuario, email, senha) VALUES ($1, $2, $3) RETURNING *",[nome_usuario, email, hash]);
+           const user = result.rows[0];
+           req.login(user, (err)=>{
+            console.log(err);
+            res.redirect("/");
+           });
         }
         });
                 
