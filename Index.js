@@ -90,7 +90,10 @@ app.post("/cadastro", async (req, res)=>{
                     }
 } );
 
-app.post("/login", async (req, res)=>{});
+app.post("/login", passport.authenticate("local", {
+    successRedirect: "/cronograma",
+    failureRedirect: "/login",
+}));
 
 passport.use(new Strategy(async function verify(email, senha, cb){
      try{
