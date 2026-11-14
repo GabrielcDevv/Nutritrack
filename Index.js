@@ -46,19 +46,12 @@ app.get("/cadastro", (req, res)=>{
 
 
 app.get("/cronograma", async (req,res)=>{
-        if(req.isAuthenticated()){
-                const id_usuario = req.user.id_usuario;
-                const diaSemana = req.body.id_dia;
-                const horario = req.body.id_horario;
-            try{
-                await db.query("SELECT * FROM usuario_alimento_dia_horario WHERE id_usuario = $1, id_dia = $2, id_horario =  $3"[id_usuario,diaSemana,horario]);
-                res.redirect("/");
-            } catch{
-                console.log(err);
-            }
-        } else{
-            res.redirect("/");
-        }
+    const id = req.user.id_usuario;
+    const result = await db.query("Select genero, idade, altura_cm FROM usuario WHERE id_usuario = $1", [id]);
+    const user = result.rows[0];
+    const peso = await db.query("SELECT peso_atual FROM pesos WHERE id_usuario = $1", [id]);
+    calculoCalorico(user.genero, peso, user.altura_cm, user.idade);
+    res.render("cronograma.ejs", {gastoRepouso: gastoRepouso});
 });
 
 app.post("/cadastro", async (req, res)=>{
@@ -73,7 +66,7 @@ app.post("/cadastro", async (req, res)=>{
     try{
         if(checarEmail.rowCount > 0)
         {
-           return res.send("<script>alert('Email já cadastrado'); window.location.href='/cadastro';</script>");
+            return res.send("<script>alert('Email já cadastrado'); window.location.href='/';</script>");
         } else{
             bcrypt.hash(senha, saltRound, async (err, hash)=>{
                 if(err){
@@ -86,10 +79,9 @@ app.post("/cadastro", async (req, res)=>{
             res.redirect("/");
            });
         }
-        });
-                
+        });     
         }
-            } catch {
+            } catch(err) {
             console.log("Dados nao enviados");
             return res.send("<script>alert('Cadastro deu errado'); window.location.href='/cadastro';</script>");
                     }
@@ -99,6 +91,9 @@ app.post("/", passport.authenticate("local", {
     successRedirect: "/cronograma",
     failureRedirect: "/",
 }));
+
+app.post("/cronograma", async (req,res)=>{
+});
 
 passport.use(new Strategy({
     usernameField: 'email',
@@ -137,6 +132,16 @@ passport.serializeUser((user, cb)=>{
 passport.deserializeUser((user, cb)=>{
     cb(null, user);
 });
+
+function calculoCalorico(genero, peso, altura, idade){
+    if(genero == "masculino"){
+        const gastoRepouso = ( 10 * peso) + (6.25 * altura) - (5 * idade) + 5;
+        return gastoRepouso;
+    } else{
+        const gastoRepouso = (10 * peso) + (6.25 * altura) - (5 * idade) - 161
+        return gastoRepouso;
+    }
+};
 
 app.listen(port, ()=>{
     console.log(`Server is running on port ${port}.`);
