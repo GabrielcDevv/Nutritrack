@@ -13,5 +13,9 @@
             <h1>nome exercicio: <%= exercicios.descricao %></h1>
             <h1>intensidade exercicio: <%= exercicios.intensidade %></h1>
         <% } %>
+
+        <% for (let metUsuario of locals.metUsuario) { %>
+            <h1><%= metUsuario%></h1>
+        <% } %>
 </body>
 </html>
