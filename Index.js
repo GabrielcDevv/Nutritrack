@@ -67,17 +67,10 @@ app.get("/cronograma", async (req,res)=>{
 
     const paraAdicionarMet = await db.query("SELECT descricao, intensidade FROM exercicios");
     const resultMet =  paraAdicionarMet.rows;
-
-    const  userExercicio = await db.query("SELECT id_exercicio FROM exercicios WHERE id_usuario = $1",[id]);
-    const idExercicio = userExercicio.rows;
-
-    const met = await db.query("SELECT met FROM exercicios WHERE id_exercicios = $1", [idExercicio]);
-    const metUsuario = met.rows;
     
     res.render("cronograma.ejs", 
         {gastoRepouso: gastoRepouso,
-         paraAdicionarMet: resultMet,
-         metUsuario: metUsuario  
+         paraAdicionarMet: resultMet, 
         });
 });
 
