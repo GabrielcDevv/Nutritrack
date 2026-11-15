@@ -6,8 +6,12 @@
     <title>Cronograma</title>
 </head>
 <body>
-    <form action="/cronograma" method="get">
         <h1>tanto faz</h1>
-    </form>
+            <h2><%= gastoRepouso %> kcal/dia</h2>
+        
+        <% for (let exercicios of locals.paraAdicionarMet) { %>
+            <h1>nome exercicio: <%= exercicios.descricao %></h1>
+            <h1>intensidade exercicio: <%= exercicios.intensidade %></h1>
+        <% } %>
 </body>
 </html>

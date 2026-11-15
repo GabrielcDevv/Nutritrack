@@ -36,6 +36,16 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+function calculoCalorico(genero, peso, altura, idade){
+    if(genero == "masculino"){
+        const gastoRepouso = ( 10 * peso) + (6.25 * altura) - (5 * idade) + 5;
+        return gastoRepouso;
+    } else{
+        const gastoRepouso = (10 * peso) + (6.25 * altura) - (5 * idade) - 161
+        return gastoRepouso;
+    }
+};
+
 app.get("/", (req,res)=>{
     res.render("login.ejs");
 })
@@ -46,12 +56,24 @@ app.get("/cadastro", (req, res)=>{
 
 
 app.get("/cronograma", async (req,res)=>{
+
     const id = req.user.id_usuario;
     const result = await db.query("Select genero, idade, altura_cm FROM usuario WHERE id_usuario = $1", [id]);
     const user = result.rows[0];
+
     const peso = await db.query("SELECT peso_atual FROM pesos WHERE id_usuario = $1", [id]);
-    calculoCalorico(user.genero, peso, user.altura_cm, user.idade);
-    res.render("cronograma.ejs", {gastoRepouso: gastoRepouso});
+
+    const gastoRepouso = calculoCalorico(user.genero, peso.rows[0].peso_atual, user.altura_cm, user.idade);
+
+    const paraAdicionarMet = await db.query("SELECT descricao, intensidade FROM exercicios");
+    const resultMet =  paraAdicionarMet.rows;
+
+    const  userExercicio
+   
+    res.render("cronograma.ejs", 
+        {gastoRepouso: gastoRepouso,
+         paraAdicionarMet: resultMet   
+        });
 });
 
 app.post("/cadastro", async (req, res)=>{
@@ -132,16 +154,6 @@ passport.serializeUser((user, cb)=>{
 passport.deserializeUser((user, cb)=>{
     cb(null, user);
 });
-
-function calculoCalorico(genero, peso, altura, idade){
-    if(genero == "masculino"){
-        const gastoRepouso = ( 10 * peso) + (6.25 * altura) - (5 * idade) + 5;
-        return gastoRepouso;
-    } else{
-        const gastoRepouso = (10 * peso) + (6.25 * altura) - (5 * idade) - 161
-        return gastoRepouso;
-    }
-};
 
 app.listen(port, ()=>{
     console.log(`Server is running on port ${port}.`);
