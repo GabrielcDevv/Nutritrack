@@ -6,14 +6,28 @@
     <title>Cronograma</title>
 </head>
 <body>
-        <h1>tanto faz</h1>
-            <h2><%= gastoRepouso %> kcal/dia</h2>
-        
-        <% for (let exercicios of locals.paraAdicionarMet) { %>
-            <h1>nome exercicio: <%= exercicios.descricao %></h1>
-            <h1>intensidade exercicio: <%= exercicios.intensidade %></h1>
+    <h1>tanto faz</h1>
+
+    <h2><%= gastoRepouso %> kcal/dia</h2>
+        <form action="/cronograma" method="POST">
+            <table>
+            <% for (let exercicios of locals.paraAdicionarMet) { %>
+                <tr>
+                <th> nome exercicio </th>
+                <th> intensidade exercicio </th>
+                </tr> 
+                <tr>
+                <td> <%= exercicios.descricao %> </td>
+                <td> <%= exercicios.intensidade %> </td>
+                </tr>
+                
+                 
+            <% } %>
+            </table>
+        </form>
+
+        <% for (let metUsuario of locals.metUsuario) { %>
+            <h1><%= metUsuario%></h1>
         <% } %>
-
-
 </body>
 </html>
