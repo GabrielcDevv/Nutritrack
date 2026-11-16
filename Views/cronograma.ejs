@@ -10,7 +10,7 @@
 
     <h2><%= gastoRepouso %> kcal/dia</h2>
         <form action="/cronograma" method="POST">
-            <table>
+            <table border="1">
             <% for (let exercicios of locals.paraAdicionarMet) { %>
                 <tr>
                 <th> nome exercicio </th>
@@ -26,8 +26,5 @@
             </table>
         </form>
 
-        <% for (let metUsuario of locals.metUsuario) { %>
-            <h1><%= metUsuario%></h1>
-        <% } %>
 </body>
 </html>

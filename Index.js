@@ -58,15 +58,14 @@ app.get("/cadastro", (req, res)=>{
 app.get("/cronograma", async (req,res)=>{
 
     const id = req.user.id_usuario;
-    const result = await db.query("Select genero, idade, altura_cm FROM usuario WHERE id_usuario = $1", [id]);
+    const result = await db.query("Select genero, idade, altura_cm, peso_atual FROM usuario WHERE id_usuario = $1", [id]);
     const user = result.rows[0];
 
-    const peso = await db.query("SELECT peso_atual FROM pesos WHERE id_usuario = $1", [id]);
-
-    const gastoRepouso = calculoCalorico(user.genero, peso.rows[0].peso_atual, user.altura_cm, user.idade);
+    const gastoRepouso = calculoCalorico(user.genero, user.peso_atual, user.altura_cm, user.idade);
 
     const paraAdicionarMet = await db.query("SELECT descricao, intensidade FROM exercicios");
     const resultMet =  paraAdicionarMet.rows;
+
     
     res.render("cronograma.ejs", 
         {gastoRepouso: gastoRepouso,
@@ -80,6 +79,7 @@ app.post("/cadastro", async (req, res)=>{
     const senha = req.body.senha;
     const genero = req.body.genero;
     const idade = req.body.idade;
+    const peso = req.body.peso;
 
     const checarEmail = await db.query("SELECT id_usuario FROM usuario WHERE LOWER(email) = $1", [email]);
     
@@ -92,11 +92,11 @@ app.post("/cadastro", async (req, res)=>{
                 if(err){
                     console.log("Erro durante o hash", err);
                 } else {
-            const result = await db.query("INSERT INTO usuario (nome_usuario, email, senha, idade, genero) VALUES ($1, $2, $3, $4, $5) RETURNING *",[nome_usuario, email, hash, idade, genero]);
+            const result = await db.query("INSERT INTO usuario (nome_usuario, email, senha, idade, genero, peso_atual) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",[nome_usuario, email, hash, idade, genero, peso]);
            const user = result.rows[0];
            req.login(user, (err)=>{
             console.log(err);
-            res.redirect("/");
+            res.redirect("/cronograma");
            });
         }
         });     
