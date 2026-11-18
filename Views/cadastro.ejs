@@ -13,21 +13,32 @@
     <form action="/cadastro" method="POST">
         <label for="nome_usuario">Primeiro nome</label> <br>
         <input type="text" id="nome_usuario" name="nome_usuario" required> <br>
+
         <label for="email">Email</label> <br>
         <input type="email" id="email" name="email" required> <br>
+
         <label for="senha">Senha</label> <br>
         <input type="password" id="senha" name="senha" required><br>
-        <label for="idade">Sua idade</label><br>
-        <input type="number" id="idade" name="idade" min="0" max="99" step="1" required><br>
-        <label for="genero">Seu Gênero</label><br>
+
+        <label for="idade_usuario">Sua idade</label><br>
+        <input type="number" id="idade_usuario" name="idade_usuario" min="0" max="99" step="1" required><br>
+
+        <label for="genero_usuario">Seu Gênero</label><br>
         <small style="display: block; color: #666; margin-bottom: 8px;">
             Selecione o gênero de nascença para um cálculo de gasto calórico mais preciso
         </small>
-        <input type="radio" id="feminino" name="genero" value="feminino">
+        <input type="radio" id="feminino" name="genero" value="feminino"><br>
+
         <label for="feminino">Feminino</label><br>
 
         <input type="radio" id="masculino" name="genero" value="masculino">
-        <label for="masculino">Masculino</label><br>
+        <label for="masculino">Masculino</label><br><br>
+
+        <label for="altura_usuario">Sua altura (cm)</label><br>
+        <input type="text" inputmode="numeric" id="altura_usuario" placeholder="Ex: 175" maxlength="4" required><br>
+
+        <label for="peso_usuario">Seu peso (Kg)</label><br>
+        <input type="text" inputmode="decimal" id="peso_usuario" name="peso_usuario"  placeholder="Ex: 72,5" required><br>
 
         <input type="submit" value="Enviar">
     </form><br>
@@ -35,5 +46,98 @@
     <a href="/" title="Ir para o login">
         Ir para o Login
     </a>
+
+    <script>
+        const inputAltura = document.getElementById('altura_usuario')
+        const inputPeso = document.getElementById('peso_usuario')
+
+        inputAltura.addEventListener('blur', function (e) {
+      let valor = e.target.value.replace(',', '.');
+      if (!valor) return;
+
+      let numero = parseFloat(valor);
+
+      // converte metros para cm (1,75) para (175)
+      if (numero > 0 && numero < 3) {
+        numero = Math.round(numero * 100);
+      } else {
+        numero = Math.round(numero);
+      }
+
+      e.target.value = isNaN(numero) ? '' : numero;
+
+      // limite de 50 cm a 250 cm
+      if (numero < 50 || numero > 250) {
+        erroAltura.textContent = 'Informe uma altura entre 50 e 250 cm.';
+        inputAltura.classList.add('invalido');
+      }
+    });
+
+
+
+
+
+    inputPeso.addEventListener('input', function (e) {
+      let valor = e.target.value;
+      erroPeso.textContent = '';
+      inputPeso.classList.remove('invalido');
+
+      // troca ponto por vírgula e remove letras/símbolos
+      valor = valor.replace(/\./g, ',').replace(/[^0-9,]/g, '');
+
+      // verifica se o usuário digitou vírgula ou ponto manualmente
+      if (valor.includes(',')) {
+        const partes = valor.split(',');
+        const inteiros = partes[0].slice(0, 3);
+        const decimais = partes.slice(1).join('').slice(0, 1);
+        valor = (inteiros === '' ? '0' : inteiros) + ',' + decimais;
+      } 
+      // verifica se digitou 4 números diretos sem vírgula (ex: 1055 e converte para 105,5)
+      else if (valor.length === 4) {
+        valor = valor.slice(0, 3) + ',' + valor.slice(3);
+      }
+
+      e.target.value = valor;
+    });
+
+    inputPeso.addEventListener('blur', function (e) {
+      let valor = e.target.value;
+      if (!valor) return;
+
+      // Remove vírgula solta no final (ex: "72," -> "72")
+      if (valor.endsWith(',')) {
+        valor = valor.slice(0, -1);
+        e.target.value = valor;
+      }
+
+      // limite de 20 kg a 350 kg
+      const numero = parseFloat(valor.replace(',', '.'));
+      if (numero < 20 || numero > 350) {
+        erroPeso.textContent = 'Informe um peso entre 20 e 350 kg.';
+        inputPeso.classList.add('invalido');
+      }
+    });
+
+
+
+
+
+
+
+    /*
+     --- CAPTURA DOS VALORES LIMPOS NO ENVIO ---
+    document.getElementById('form-medidas').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const alturaFinal = parseInt(inputAltura.value, 10);
+      const pesoFinal = parseFloat(inputPeso.value.replace(',', '.'));
+
+      console.log('Dados prontos para enviar:', {
+        altura_cm: alturaFinal, // Número inteiro (ex: 175)
+        peso_kg: pesoFinal      // Número decimal padrão JS (ex: 72.5)
+      });
+    });
+    */
+    </script>
 </body>
 </html>
