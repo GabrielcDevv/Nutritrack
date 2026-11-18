@@ -9,7 +9,7 @@ import { Strategy } from "passport-local";
 
 const db = new pg.Client ({
     user: "postgres",
-    host: "localhost",
+    host: "host.docker.internal",
     database: "NutriTrack",
     password: "Patoduro1!",
     port: 5432,
