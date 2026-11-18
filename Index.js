@@ -79,7 +79,9 @@ app.post("/cadastro", async (req, res)=>{
     const senha = req.body.senha;
     const genero = req.body.genero;
     const idade = req.body.idade;
+    const altura = req.body.altura;
     const peso = req.body.peso;
+
 
     const checarEmail = await db.query("SELECT id_usuario FROM usuario WHERE LOWER(email) = $1", [email]);
     
@@ -92,7 +94,7 @@ app.post("/cadastro", async (req, res)=>{
                 if(err){
                     console.log("Erro durante o hash", err);
                 } else {
-            const result = await db.query("INSERT INTO usuario (nome_usuario, email, senha, idade, genero, peso_atual) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",[nome_usuario, email, hash, idade, genero, peso]);
+            const result = await db.query("INSERT INTO usuario (nome_usuario, email, senha, idade, genero, altura_cm, peso_atual) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",[nome_usuario, email, hash, idade, genero, altura, peso]);
            const user = result.rows[0];
            req.login(user, (err)=>{
             console.log(err);

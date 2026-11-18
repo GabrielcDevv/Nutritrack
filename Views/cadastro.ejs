@@ -21,7 +21,7 @@
         <input type="password" id="senha" name="senha" required><br>
 
         <label for="idade_usuario">Sua idade</label><br>
-        <input type="number" id="idade_usuario" name="idade_usuario" min="0" max="99" step="1" required><br>
+        <input type="number" id="idade" name="idade" min="0" max="99" step="1" required><br>
 
         <label for="genero_usuario">Seu Gênero</label><br>
         <small style="display: block; color: #666; margin-bottom: 8px;">
@@ -35,10 +35,10 @@
         <label for="masculino">Masculino</label><br><br>
 
         <label for="altura_usuario">Sua altura (cm)</label><br>
-        <input type="text" inputmode="numeric" id="altura_usuario" placeholder="Ex: 175" maxlength="4" required><br>
+        <input type="text" inputmode="numeric" id="altura" name="altura" placeholder="Ex: 175" maxlength="4" required><br>
 
         <label for="peso_usuario">Seu peso (Kg)</label><br>
-        <input type="text" inputmode="decimal" id="peso_usuario" name="peso_usuario"  placeholder="Ex: 72,5" required><br>
+        <input type="text" inputmode="decimal" id="peso_usuario" name="peso"  placeholder="Ex: 72.5" required><br>
 
         <input type="submit" value="Enviar">
     </form><br>
@@ -48,8 +48,8 @@
     </a>
 
     <script>
-        const inputAltura = document.getElementById('altura_usuario')
-        const inputPeso = document.getElementById('peso_usuario')
+        const inputAltura = document.getElementById('altura')
+        const inputPeso = document.getElementById('peso')
 
         inputAltura.addEventListener('blur', function (e) {
       let valor = e.target.value.replace(',', '.');
