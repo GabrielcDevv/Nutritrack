@@ -63,7 +63,7 @@ app.get("/cronograma", async (req,res)=>{
 
     const gastoRepouso = calculoCalorico(user.genero, user.peso_atual, user.altura_cm, user.idade);
 
-    const paraAdicionarMet = await db.query("SELECT descricao, intensidade FROM exercicios");
+    const paraAdicionarMet = await db.query("SELECT descricao, intensidade FROM exercicios as e JOIN exercicios_usuario as eu on e.id_exercicio = eu.id_exercicio WHERE id_usuario = $1", [id]);
     const resultMet =  paraAdicionarMet.rows;
 
     
