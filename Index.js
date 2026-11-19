@@ -57,20 +57,27 @@ app.get("/cadastro", (req, res)=>{
 
 app.get("/cronograma", async (req,res)=>{
 
+    try{
     const id = req.user.id_usuario;
     const result = await db.query("Select genero, idade, altura_cm, peso_atual FROM usuario WHERE id_usuario = $1", [id]);
     const user = result.rows[0];
 
     const gastoRepouso = calculoCalorico(user.genero, user.peso_atual, user.altura_cm, user.idade);
 
-    const paraAdicionarMet = await db.query("SELECT descricao, intensidade FROM exercicios as e JOIN exercicios_usuario as eu on e.id_exercicio = eu.id_exercicio WHERE id_usuario = $1", [id]);
-    const resultMet =  paraAdicionarMet.rows;
+    const usuarioExercicios = await db.query("SELECT descricao, intensidade FROM exercicios as e JOIN exercicios_usuario as eu on e.id_exercicio = eu.id_exercicio WHERE id_usuario = $1", [id]);
+    const usuarioMet =  usuarioExercicios.rows;
 
+    const diaSemana = await  db.query("SELECT dia FROM dia_semana");
+    const resultadoDia = diaSemana.rows;
     
     res.render("cronograma.ejs", 
         {gastoRepouso: gastoRepouso,
-         paraAdicionarMet: resultMet, 
+         usuarioExercicios: usuarioMet,
+         resultadoDia: resultadoDia 
         });
+    } catch (err){
+        console.log(err);
+    }
 });
 
 app.post("/cadastro", async (req, res)=>{

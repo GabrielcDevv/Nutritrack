@@ -7,11 +7,8 @@
 </head>
 <body>
     <h1>tanto faz</h1>
-
-    <h2><%= gastoRepouso %> kcal/dia</h2>
-        <form action="/cronograma" method="POST">
-            <table border="1">
-            <% for (let exercicios of locals.paraAdicionarMet) { %>
+     <table border="1">
+            <% for (let exercicios of locals.usuarioExercicios) { %>
                 <tr>
                 <th> nome exercicio </th>
                 <th> intensidade exercicio </th>
@@ -19,11 +16,17 @@
                 <tr>
                 <td> <%= exercicios.descricao %> </td>
                 <td> <%= exercicios.intensidade %> </td>
-                </tr>
-                
-                 
+                </tr>   
             <% } %>
             </table>
+
+    <h2><%= gastoRepouso %> kcal/dia</h2>
+        <form action="/cronograma" method="POST">
+           <div>
+            <% for (let dia of locals.resultadoDia){ %>
+            <%= dia.dia%>
+            <% } %>
+           </div>
         </form>
 
 </body>
